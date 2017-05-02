@@ -1,0 +1,18 @@
+name: MurderMysteryPMMP
+author: "jasonwynn10"
+version: 0.1.0
+api:
+- 3.0.0-ALPHA5
+main: jasonwynn10\murder\Main
+description: ""
+load: POSTWORLD
+website: "https://github.com/jasonwynn10/MurderMysteryPMMP"
+commands:
+  murdermystery:
+    usage: "/mm [join|quit|info]"
+    permission: murder.mystery.play
+    description: "Adds the player to the Murder Mystery Game Queue"
+    alias: ["mm","murder"]
+permissions:
+  murder.mystery.play:
+    default: true
