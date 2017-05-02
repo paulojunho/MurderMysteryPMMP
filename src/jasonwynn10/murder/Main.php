@@ -4,7 +4,6 @@ namespace jasonwynn10\murder;
 use pocketmine\plugin\PluginBase;
 use pocketmine\command\CommandSender;
 use pocketmine\command\Command;
-use pocketmine\event\Listener;
 use pocketmine\utils\TextFormat as TF;
 use pocketmine\Player;
 
@@ -19,5 +18,14 @@ class Main extends PluginBase {
 	}
 	public function onDisable() {
 		$this->getLogger()->notice(TF::GREEN."Disabled!");
+	}
+	
+	// API
+	
+	public function addQueue(Player $player) {
+		//TODO
+	}
+	public function removeQueue(Player $player) {
+		//TODO
 	}
 }
