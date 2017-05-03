@@ -1,7 +1,7 @@
 <?php
 namespace jasonwynn10\murder;
 
-use use pocketmine\command\PluginCommand;
+use pocketmine\command\PluginCommand;
 
 class MurderMystery extends PluginCommand {
 	public function __construct(Main $plugin) {
