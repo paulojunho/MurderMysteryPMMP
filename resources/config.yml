@@ -1,36 +1,46 @@
-#     #                                            #     #                                              
-##   ##  #    #  #####   #####   ######  #####     ##   ##  #   #   ####   #####  ######  #####   #   #
-# # # #  #    #  #    #  #    #  #       #    #    # # # #   # #   #         #    #       #    #   # #
-#  #  #  #    #  #    #  #    #  #####   #    #    #  #  #    #     ####     #    #####   #    #    #
-#     #  #    #  #####   #    #  #       #####     #     #    #         #    #    #       #####     #
-#     #  #    #  #   #   #    #  #       #   #     #     #    #    #    #    #    #       #   #     #
-#     #   ####   #    #  #####   ######  #    #    #     #    #     ####     #    ######  #    #    #
+############################################################################################################
+#                                                                                                          #
+# #     #                                            #     #                                               #
+# ##   ##  #    #  #####   #####   ######  #####     ##   ##  #   #   ####   #####  ######  #####   #   #  #
+# # # # #  #    #  #    #  #    #  #       #    #    # # # #   # #   #         #    #       #    #   # #   #
+# #  #  #  #    #  #    #  #    #  #####   #    #    #  #  #    #     ####     #    #####   #    #    #    #
+# #     #  #    #  #####   #    #  #       #####     #     #    #         #    #    #       #####     #    #
+# #     #  #    #  #   #   #    #  #       #   #     #     #    #    #    #    #    #       #   #     #    #
+# #     #   ####   #    #  #####   ######  #    #    #     #    #     ####     #    ######  #    #    #    #
+#                                                                                                          #
+############################################################################################################
 
-Games:
-  "Game 1": // customizable game name
-    World: "world" // what world is the game map in?
-    Killer-Spawn: // the killer wil spawn here
+# The language that MurderMystery will use
+# Available languages: eng
+#
+# English language pack by @jasonwynn10
+language: eng
+
+Games: # game settings
+  "Game 1": # customizable game name
+    World: "world" # what world is the game map in?
+    Killer-Spawn: # the killer wil spawn here
       X: 0
       Y: 0
       Z: 0
-    Detective-Spawn: // the detective will spawn here
+    Detective-Spawn: # the detective will spawn here
       X: 0
       Y: 0
       Z: 0
-    Innocent-Spawn-Area: // innocent players will spawn within this area
+    Innocent-Spawn-Area: # innocent players will spawn within this area
       X1: 0
       Y1: 0
       Z1: 0
       X2: 0
       Y2: 0
       Z2: 0
-    Gold-Spawn-Area: // gold will spawn within this area
+    Gold-Spawn-Area: # gold will spawn within this area
       X1: 0
       Y1: 0
       Z1: 0
       X2: 0
       Y2: 0
       Z2: 0
-    max-players: 7 // maximum players before others are not allowed to join
-    min-players: 4 // minimum players to start
-    corpse: false // leave corpses after players are killed?
+    max-players: 7 # maximum players before others are not allowed to join
+    min-players: 4 # minimum players to start
+    corpse: false # leave corpses after players are killed?
