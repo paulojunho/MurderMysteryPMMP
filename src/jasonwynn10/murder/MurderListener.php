@@ -5,7 +5,7 @@ use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\Listener;
 
-class MurderListener impliments Listener {
+class MurderListener implements Listener {
 	private $plugin;
 	public function __construct(Main $plugin) {
 		$this->plugin = $plugin;
