@@ -19,15 +19,7 @@ language: eng
 Games: # game settings
   "Game 1": # customizable game name
     World: "world" # what world is the game map in?
-    Killer-Spawn: # the killer wil spawn here
-      X: 0
-      Y: 0
-      Z: 0
-    Detective-Spawn: # the detective will spawn here
-      X: 0
-      Y: 0
-      Z: 0
-    Innocent-Spawn-Area: # innocent players will spawn within this area
+    Player-Spawn-Area: # innocent players will spawn within this area
       X1: 0
       Y1: 0
       Z1: 0
