@@ -8,9 +8,9 @@ use pocketmine\math\Vector3;
 class MurderSession {
 	/** string $sessionName */
 	private $sessionName;
-	/** Player  */
+	/** string  */
 	private $killer, $detective;
-	/** Player[] $innocent */
+	/** string[] $innocent */
 	private $innocent = [];
 	/** @var Position[] $spawnArea */
 	protected $spawnArea = [];
@@ -19,9 +19,11 @@ class MurderSession {
 		$this->levelName = $levelName;
 		$this->spawnArea[0] = $playerSpawnA;
 		$this->spawnArea[1] = $playerSpawnB;
-		$this->killer = $killer;
-		$this->detective = $detective;
-		$this->innocent = $innocent;
+		$this->killer = $killer->getName();
+		$this->detective = $detective->getName();
+		foreach($innocent as $pl) {
+			$this->innocent[] = $pl->getName();
+		}
 	}
 	public function getName() : string{
 		return $this->sessionName;
@@ -40,5 +42,17 @@ class MurderSession {
 		$y = mt_rand($this->spawnArea[0]->y, $this->spawnArea[1]->y);
 		$z = mt_rand($this->spawnArea[0]->z, $this->spawnArea[1]->z);
 		return new Vector3($x, $y, $z);
+	}
+	/**
+	 * @var string|Player $player
+	 * @return string
+	 */
+	public function getRole($player) : string{
+		$player = $player instanceof Player ? $player->getName() : $player;
+		$key = array_search($player, $this->getPlayers());
+		if($key != "killer" and $key != "detective") {
+			return "innocent";
+		}
+		return $key;
 	}
 }
