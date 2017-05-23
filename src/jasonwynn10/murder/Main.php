@@ -11,6 +11,7 @@ use pocketmine\utils\TextFormat as TF;
 class Main extends PluginBase {
 	/** @var BaseLang $baseLang */
 	private $baseLang = null;
+	private $sessions = [];
 	public function onLoad() {
 		$this->getCommandMap()->register(MurderMystery::class, new MurderMystery($this));
 		$this->getServer()->getPluginManager()->registerEvents(new MurderListener($this), $this);
@@ -34,11 +35,30 @@ class Main extends PluginBase {
 	public function getLanguage() : BaseLang {
 		return $this->baseLang;
 	}
-	
+	/**
+	 * @api
+	 */
 	public function addQueue(Player $player) {
 		//TODO
 	}
+	/**
+	 * @api
+	 */
 	public function removeQueue(Player $player) {
 		//TODO
+	}
+	/**
+	 * @api
+	 * @var string|Player $player
+	 * @return bool|MurderSession
+	 */
+	public function inSession($player) {
+		$player = $player instanceof Player ? $player->getName() : $player;
+		foreach($this->sessions as $session) {
+			if(in_array($player,$session->getPlayers())) {
+				return $session;
+			}
+		}
+		return false;
 	}
 }
