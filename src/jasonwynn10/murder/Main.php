@@ -2,30 +2,44 @@
 namespace jasonwynn10\murder;
 
 use pocketmine\lang\BaseLang;
-use pocketmine\command\CommandSender;
-use pocketmine\command\Command;
+use pocketmine\level\Level;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
+use pocketmine\tile\Sign;
 use pocketmine\utils\TextFormat as TF;
+
+use jasonwynn10\murder\commands\MurderMystery;
+use jasonwynn10\murder\events\MurderListener;
+
+use spoondetector\SpoonDetector;
 
 class Main extends PluginBase {
 	/** @var BaseLang $baseLang */
 	private $baseLang = null;
+	/** @var string[] $queue */
+	private $queue = [];
+	/** @var MurderSession[] $sessions */
 	private $sessions = [];
+	/** @var Sign[] $signTiles */
+	private $signTiles = [];
 	public function onLoad() {
-		$this->getCommandMap()->register(MurderMystery::class, new MurderMystery($this));
+		$this->getServer()->getCommandMap()->register(MurderMystery::class, new MurderMystery($this));
 		$this->getServer()->getPluginManager()->registerEvents(new MurderListener($this), $this);
 	}
 	public function onEnable() {
+		SpoonDetector::printSpoon($this,"spoon.txt");
 		$this->saveDefaultConfig();
 		$lang = $this->getConfig()->get("language", BaseLang::FALLBACK_LANGUAGE);
-        	$this->baseLang = new BaseLang($lang, $this->getFile() . "resources/");
+		$this->baseLang = new BaseLang($lang, $this->getFile() . "resources/");
 		$this->getLogger()->notice(TF::GREEN."Enabled!");
 	}
 	public function onDisable() {
 		$this->getLogger()->notice(TF::GREEN."Disabled!");
 	}
-	
+	public static function isDev() {
+	    return self::isPhar();
+    }
+
 	// API
 	
 	/**
@@ -37,17 +51,56 @@ class Main extends PluginBase {
 	}
 	/**
 	 * @api
+     *
+     * @param Player $player
+     *
 	 */
 	public function addQueue(Player $player) {
-		//TODO
+		$this->queue[] = $player->getName();
 	}
 	/**
 	 * @api
+     *
+     * @param Player $player
+     *
 	 */
 	public function removeQueue(Player $player) {
-		//TODO
+		if(in_array($player->getName(),$this->queue)){
+		    $key = array_search($player->getName(),$this->queue);
+            unset($this->queue[$key]);
+        }
 	}
-	/**
+
+    public function addSign(Sign $signTile){
+        $signs = $this->getConfig()->signs;
+        $signs[count($this->signTiles)] = [$signTile->getX(), $signTile->getY(), $signTile->getZ(), $signTile->getLevel()->getName()];
+        $this->getConfig()->set("signs", $signs);
+        $this->getConfig()->save();
+        array_push($this->signTiles, $signTile);
+    }
+
+    /**
+     * Refresh all 1vs1 signs
+     */
+    public function refreshSigns(){
+        foreach ($this->signTiles as $signTile){
+            if($signTile->level instanceof Level){
+                $signTile->setText(OneVsOne::SIGN_TITLE, "-Waiting " . count($this->queue), "-Arenas: " . $this->getNumberOfFreeArenas(), "-+===+-");
+            }
+        }
+    }
+
+    public function getNumberOfFreeArenas(){
+        $numberOfFreeArenas = count($this->sessions);
+        foreach ($this->sessions as $session){
+            if($session->isActive()){
+                $numberOfFreeArenas--;
+            }
+        }
+        return $numberOfFreeArenas;
+    }
+
+    /**
 	 * @api
 	 * @var string|Player $player
 	 * @return bool|MurderSession

@@ -4,4 +4,7 @@ branches:
 projects:
   MurderMysteryPMMP:
     path: ""
+    libs:
+     - src: Falkirks/spoondetector/spoondetector
+       version: 0.0.0
 ...

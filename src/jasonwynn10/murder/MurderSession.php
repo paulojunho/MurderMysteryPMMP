@@ -4,6 +4,7 @@ namespace jasonwynn10\murder;
 use pocketmine\level\Position;
 use pocketmine\Player;
 use pocketmine\math\Vector3;
+use pocketmine\Server;
 
 class MurderSession {
 	/** string $sessionName */
@@ -14,6 +15,7 @@ class MurderSession {
 	private $innocent = [];
 	/** @var Position[] $spawnArea */
 	protected $spawnArea = [];
+	private $active = false;
 	public function __construct(string $sessionName, string $levelName, Position $playerSpawnA, Position $playerSpawnB, Player $killer, Player $detective, Player ...$innocent) {
 		$this->sessionName = $sessionName;
 		$this->levelName = $levelName;
@@ -37,11 +39,12 @@ class MurderSession {
 		$arr["detective"] = $this->detective;
 		return $arr;
 	}
-	public function getRandomSpawnCoords() : Vector3{
+	public function getRandomSpawnCoords() : Position{
 		$x = mt_rand($this->spawnArea[0]->x, $this->spawnArea[1]->x);
 		$y = mt_rand($this->spawnArea[0]->y, $this->spawnArea[1]->y);
 		$z = mt_rand($this->spawnArea[0]->z, $this->spawnArea[1]->z);
-		return new Vector3($x, $y, $z);
+		$level = Server::getInstance()->getLevelByName($this->levelName);
+		return new Position($x, $y, $z, $level);
 	}
 	/**
 	 * @var string|Player $player
@@ -55,4 +58,10 @@ class MurderSession {
 		}
 		return $key;
 	}
+	public function isActive() : bool{
+	    return $this->active;
+    }
+    public function setActive(bool $active = true) {
+	    $this->active = $active;
+    }
 }
