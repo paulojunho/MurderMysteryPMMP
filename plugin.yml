@@ -3,8 +3,9 @@ author: "jasonwynn10"
 version: 0.1.0
 api:
 - 3.0.0-ALPHA5
+- 3.0.0-ALPHA6
 main: jasonwynn10\murder\Main
-description: ""
+description: "A Murder Mystery Minigame Plugin for PMMP servers"
 load: POSTWORLD
 website: "https://github.com/jasonwynn10/MurderMysteryPMMP"
 commands:

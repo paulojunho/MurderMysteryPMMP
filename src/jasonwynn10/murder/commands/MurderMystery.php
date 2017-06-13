@@ -25,9 +25,12 @@ class MurderMystery extends PluginCommand {
 	public function execute(CommandSender $sender, $alias, array $args) {
 		if($sender instanceof Player and $this->testPermission($sender) and $this->getPlugin()->isEnabled() and count($args) > 0) {
 		    if(isset($args[0]) and array_search($args[0],$this->getPlugin()->getMaps())) {
-                // TODO
+                $this->getPlugin()->addQueue($sender,$args[0]);
+            }elseif(isset($args[0])) {
+		        $sender->sendMessage($this->getPlugin()->getLanguage()->translateString("command.invalidMap",[$args[0]]));
+            }else{
+		        return false;
             }
-			$this->getPlugin()->addQueue($sender);
 			return true;
 		}
 		return false;

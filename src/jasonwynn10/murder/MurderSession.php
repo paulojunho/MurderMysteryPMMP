@@ -15,13 +15,16 @@ class MurderSession {
 	/** @var Position[] $spawnArea */
 	protected $spawnArea = [];
 	private $active = false;
-	public function __construct(string $sessionName, string $levelName, Position $playerSpawnA, Position $playerSpawnB, Player $killer, Player $detective, Player ...$innocent) {
+	public function __construct(string $sessionName, string $levelName, Position $playerSpawnA, Position $playerSpawnB, Player $killer = null, Player $detective = null, Player ...$innocent) {
 		$this->sessionName = $sessionName;
 		$this->levelName = $levelName;
 		$this->spawnArea[0] = $playerSpawnA;
 		$this->spawnArea[1] = $playerSpawnB;
 		$this->killer = $killer->getName();
 		$this->detective = $detective->getName();
+		if($innocent = null) {
+		    $innocent = [];
+        }
 		foreach($innocent as $pl) {
 			$this->innocent[] = $pl->getName();
 		}
@@ -58,9 +61,9 @@ class MurderSession {
 		return $key;
 	}
 	public function isActive() : bool{
-	    return $this->active;
-    }
-    public function setActive(bool $active = true) {
-	    $this->active = $active;
-    }
+		return $this->active;
+	}
+	public function setActive(bool $active = true) {
+		$this->active = $active;
+	}
 }
