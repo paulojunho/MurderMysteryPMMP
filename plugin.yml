@@ -16,3 +16,10 @@ commands:
 permissions:
   murder.mystery.play:
     default: true
+  murder.mystery.sign:
+    default: op
+    children:
+      murder.mystery.sign.make:
+        default: op
+      murder.mystery.sign.remove:
+        default: op

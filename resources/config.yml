@@ -17,7 +17,7 @@
 language: eng
 
 Bow-cost: 10 # amount of gold needed to get a single-shot bow
-Gold-time: 5 # time betweeb gold spawns/despawns
+Gold-time: 5 # time between gold spawns/despawns
 corpse: false # leave corpses after players are killed?
 Show-Title: true # show titles on game start?
 
@@ -40,3 +40,4 @@ Games: # game settings
       Z2: 0
     max-players: 7 # maximum players before others are not allowed to join
     min-players: 4 # minimum players to start
+signs: # Murder Mystery Signs

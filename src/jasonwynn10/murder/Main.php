@@ -2,7 +2,6 @@
 namespace jasonwynn10\murder;
 
 use pocketmine\lang\BaseLang;
-use pocketmine\level\Level;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\tile\Sign;
@@ -22,6 +21,8 @@ class Main extends PluginBase {
 	private $sessions = [];
 	/** @var Sign[] $signTiles */
 	private $signTiles = [];
+	/** @var string[] $maps */
+	private $maps = [];
 	public function onLoad() {
 		$this->getServer()->getCommandMap()->register(MurderMystery::class, new MurderMystery($this));
 		$this->getServer()->getPluginManager()->registerEvents(new MurderListener($this), $this);
@@ -72,22 +73,11 @@ class Main extends PluginBase {
 	}
 
     public function addSign(Sign $signTile){
-        $signs = $this->getConfig()->signs;
+        $signs = $this->getConfig()->get("signs",[]);
         $signs[count($this->signTiles)] = [$signTile->getX(), $signTile->getY(), $signTile->getZ(), $signTile->getLevel()->getName()];
         $this->getConfig()->set("signs", $signs);
         $this->getConfig()->save();
         array_push($this->signTiles, $signTile);
-    }
-
-    /**
-     * Refresh all 1vs1 signs
-     */
-    public function refreshSigns(){
-        foreach ($this->signTiles as $signTile){
-            if($signTile->level instanceof Level){
-                $signTile->setText(OneVsOne::SIGN_TITLE, "-Waiting " . count($this->queue), "-Arenas: " . $this->getNumberOfFreeArenas(), "-+===+-");
-            }
-        }
     }
 
     public function getNumberOfFreeArenas(){
@@ -114,4 +104,9 @@ class Main extends PluginBase {
 		}
 		return false;
 	}
+
+	public function getMaps() {
+	    return $this->maps;
+    }
+
 }

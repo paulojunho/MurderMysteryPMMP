@@ -3,7 +3,6 @@ namespace jasonwynn10\murder;
 
 use pocketmine\level\Position;
 use pocketmine\Player;
-use pocketmine\math\Vector3;
 use pocketmine\Server;
 
 class MurderSession {
