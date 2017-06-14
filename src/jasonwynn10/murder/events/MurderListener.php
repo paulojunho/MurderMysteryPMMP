@@ -52,7 +52,7 @@ class MurderListener implements Listener {
 			$nbt = new CompoundTag;
 			$nbt->Pos = new ListTag("Pos", [
 				new DoubleTag(0, $ev->getPlayer()->getX()),
-				new DoubleTag(1, $ev->getPlayer()->getY()),
+				new DoubleTag(1, $ev->getPlayer()->getY()+1),
 				new DoubleTag(2, $ev->getPlayer()->getZ())
 			]);
 			$nbt->Motion = new ListTag("Motion", [

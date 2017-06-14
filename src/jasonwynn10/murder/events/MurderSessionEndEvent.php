@@ -4,7 +4,7 @@ namespace jasonwynn10\murder\events;
 use pocketmine\Player;
 use pocketmine\plugin\Plugin;
 
-use jasonwynn10\murder\MurderSession;
+use jasonwynn10\murder\objects\MurderSession;
 
 class MurderSessionEndEvent extends MurderSessionEvent {
     /** @var string $winner */

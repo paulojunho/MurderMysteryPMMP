@@ -5,7 +5,7 @@ use pocketmine\event\Cancellable;
 use pocketmine\event\plugin\PluginEvent;
 use pocketmine\plugin\Plugin;
 
-use jasonwynn10\murder\MurderSession;
+use jasonwynn10\murder\objects\MurderSession;
 
 class MurderSessionEvent extends PluginEvent implements Cancellable {
     public static $handlerList = null;

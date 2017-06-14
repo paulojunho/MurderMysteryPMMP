@@ -10,7 +10,9 @@ use pocketmine\tile\Sign;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat as TF;
 
+use jasonwynn10\murder\objects\GameMap;
 use jasonwynn10\murder\commands\MurderMystery;
+use jasonwynn10\murder\objects\MurderSession;
 use jasonwynn10\murder\events\MurderListener;
 
 use spoondetector\SpoonDetector;
@@ -22,6 +24,8 @@ class Main extends PluginBase {
 	private $queue = [];
 	/** @var MurderSession[] $sessions */
 	private $sessions = [];
+	/** @var Config $signConfig */
+	private $signConfig;
 	/** @var Sign[] $signTiles */
 	private $signTiles = [];
 	/** @var string[] $maps */
@@ -35,6 +39,7 @@ class Main extends PluginBase {
 		$this->saveDefaultConfig();
 		$lang = $this->getConfig()->get("language", BaseLang::FALLBACK_LANGUAGE);
 		$this->baseLang = new BaseLang($lang, $this->getFile() . "resources/");
+		$this->signConfig = new Config($this->getDataFolder()."signs.yml",CONFIG::YAML);
 		$this->loadMaps();
 		$this->loadSigns();
 		$this->getLogger()->notice(TF::GREEN."Enabled!");
@@ -53,9 +58,40 @@ class Main extends PluginBase {
 	private function loadMaps() {
 		foreach ($this->getConfig()->get("Games",[]) as $name => $data) {
 			if(!isset($data["World"]) or !$this->getServer()->loadLevel($data["World"])) {
+				if(self::isDev()) {
+					$this->getLogger()->info("Map '".$name."' failed to load with invalid Level");
+				}
 				continue;
 			}
-			$this->maps[$name] = $data["World"];
+			if(!isset($data["Player-Spawn-Area"]) or !is_array($data["Player-Spawn-Area"])) {
+				if(self::isDev()) {
+					$this->getLogger()->info("Map '".$name."' failed to load with invalid Player Spawn Coordinates");
+				}
+				continue;
+			}
+			if(!isset($data["Player-Spawn-Area"]["X1"]) or !isset($data["Player-Spawn-Area"]["Y1"]) or !isset($data["Player-Spawn-Area"]["Z1"]) or !isset($data["Player-Spawn-Area"]["X2"]) or !isset($data["Player-Spawn-Area"]["Y2"]) or !isset($data["Player-Spawn-Area"]["Z2"])) {
+				if(self::isDev()) {
+					$this->getLogger()->info("Map '".$name."' failed to load with invalid Player Spawn Coordinates");
+				}
+				continue;
+			}
+			if(!isset($data["PGold-Spawn-Area"]) or !is_array($data["Gold-Spawn-Area"])) {
+				if(self::isDev()) {
+					$this->getLogger()->info("Map '".$name."' failed to load with invalid Gold Spawn Coordinates");
+				}
+				continue;
+			}
+			if(!isset($data["Gold-Spawn-Area"]["X1"]) or !isset($data["Gold-Spawn-Area"]["Y1"]) or !isset($data["Gold-Spawn-Area"]["Z1"]) or !isset($data["Gold-Spawn-Area"]["X2"]) or !isset($data["Gold-Spawn-Area"]["Y2"]) or !isset($data["Gold-Spawn-Area"]["Z2"])) {
+				if(self::isDev()) {
+					$this->getLogger()->info("Map '".$name."' failed to load with invalid Gold Spawn Coordinates");
+				}
+				continue;
+			}
+			$map = new GameMap($name, new Vector3(), new Vector3(), new Vector3(), new Vector3(), $data["World"]); //TODO use set variables
+			$this->maps[$name] = $map;
+			if(self::isDev()) {
+				$this->getLogger()->info("Map '".$map."' Loaded with Level '". $map->getLevel()."'");
+			}
 		}
 	}
 
@@ -66,16 +102,20 @@ class Main extends PluginBase {
 			}
 			$pos = new Vector3($data["x"],$data["y"],$data["z"]);
 			if(!($signTile = $world->getTile($pos)) instanceof Sign) {
+				if(self::isDev()) {
+					$this->getLogger()->info("Sign failed to load! $signTile");
+				}
 				continue;
 			}
 			$this->signTiles[] = $signTile;
+			if(self::isDev()) {
+				$this->getLogger()->info("Sign loaded! $signTile");
+			}
 		}
 	}
 
-	public function getSignConfig() {
-		return new Config($this->getDataFolder()."signs.yml",CONFIG::YAML,[
-			"Signs" => []
-		]);
+	public function getSignConfig() : Config{
+		return $this->signConfig;
 	}
 
 	// API
@@ -84,7 +124,7 @@ class Main extends PluginBase {
 	 * @api
 	 * @return BaseLang
 	 */
-	public function getLanguage() : BaseLang {
+	public function getLanguage() : BaseLang{
 		return $this->baseLang;
 	}
 	/**
@@ -139,8 +179,8 @@ class Main extends PluginBase {
 		$this->getSignConfig()->save();
 		$this->signTiles[] = $signTile;
 		if(self::isDev()) {
-		    $this->getLogger()->info("New Sign Created! $signTile");
-        }
+			$this->getLogger()->info("New Sign Created! $signTile");
+		}
 	}
 
 	/**
