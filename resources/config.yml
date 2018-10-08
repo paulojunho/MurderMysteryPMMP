@@ -18,7 +18,7 @@ language: eng
 
 Bow-cost: 10 # amount of gold needed to get a single-shot bow
 Gold-time: 15 # time between gold spawns/despawns in seconds
-corpse: false # leave corpses after players are killed?
+Corpse: false # leave corpses after players are killed?
 Show-Title: true # show titles on game start?
 
 Games: # game settings
