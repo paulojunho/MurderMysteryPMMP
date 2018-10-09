@@ -18,36 +18,39 @@ use spoondetector\SpoonDetector;
 
 class Main extends PluginBase {
 	/** @var BaseLang $baseLang */
-	private $baseLang = null;
+	protected $baseLang = null;
 	/** @var string[][] $queue */
-	private $queue = [];
+	protected $queue = [];
 	/** @var MurderSession[] $sessions */
-	private $sessions = [];
+	protected $sessions = [];
 	/** @var Config $signConfig */
-	private $signConfig;
+	protected $signConfig;
 	/** @var Sign[] $signTiles */
-	private $signTiles = [];
+	protected $signTiles = [];
 	/** @var string[] $maps */
-	private $maps = [];
+	protected $maps = [];
 
-	public function onLoad() {
+	public function onLoad() : void {
 		$this->getServer()->getCommandMap()->register(MurderMystery::class, new MurderMystery($this));
-		$this->getServer()->getPluginManager()->registerEvents(new MurderListener($this), $this);
 	}
 
-	public function onEnable() {
+	public function onEnable() : void {
 		SpoonDetector::printSpoon($this, "spoon.txt");
+		if($this->isDisabled())
+			return;
+		$this->getServer()->getPluginManager()->registerEvents(new MurderListener($this), $this);
 		$this->saveDefaultConfig();
 		/** @var string $lang */
 		$lang = $this->getConfig()->get("language", BaseLang::FALLBACK_LANGUAGE);
 		$this->baseLang = new BaseLang($lang, $this->getFile() . "resources/");
 		$this->signConfig = new Config($this->getDataFolder() . "signs.yml", CONFIG::YAML);
-		$this->loadMaps();
-		$this->loadSigns();
+		$this->reloadMaps();
+		$this->reloadSigns();
 		$this->getLogger()->notice(TF::GREEN . "Enabled!");
 	}
 
-	private function loadMaps() {
+	public function reloadMaps() {
+		$this->maps = [];
 		foreach($this->getConfig()->get("Games", []) as $name => $data) {
 			if(!isset($data["World"]) or !$this->getServer()->loadLevel($data["World"])) {
 				if(self::isDev()) {
@@ -79,7 +82,7 @@ class Main extends PluginBase {
 				}
 				continue;
 			}
-			$map = new GameMap($name, new Vector3(), new Vector3(), new Vector3(), new Vector3(), $data["World"]); //TODO use set variables
+			$map = new GameMap($name, new Vector3(), new Vector3(), new Vector3(), new Vector3(), $data["World"], $data["Max-Players"], $data["Min-Players"]);
 			$this->maps[$name] = $map;
 			if(self::isDev()) {
 				$this->getLogger()->info("Map '" . $map . "' Loaded with Level '" . $map->getLevel() . "'");
@@ -90,12 +93,13 @@ class Main extends PluginBase {
 	/**
 	 * @return bool
 	 */
-	public static function isDev() {
+	public static function isDev() : bool {
 		return true; // TODO: set false for release
 	}
 
-	private function loadSigns() {
-		foreach($this->getSignConfig()->getAll() as $signs => $data) {
+	public function reloadSigns() {
+		$this->signTiles = [];
+		foreach($this->signConfig->getAll() as $signs => $data) {
 			if(!($world = $this->getServer()->getLevelByName($data["world"])) instanceof Level) {
 				continue;
 			}
@@ -113,11 +117,14 @@ class Main extends PluginBase {
 		}
 	}
 
+	/**
+	 * @return Config
+	 */
 	public function getSignConfig() : Config {
 		return $this->signConfig;
 	}
 
-	public function onDisable() {
+	public function onDisable() : void {
 		$this->getLogger()->notice(TF::GREEN . "Disabled!");
 	}
 
@@ -146,7 +153,6 @@ class Main extends PluginBase {
 	 * @api
 	 *
 	 * @param Player $player
-	 *
 	 */
 	public function removeQueue(Player $player) {
 		foreach($this->queue as $map => $players) {
@@ -165,7 +171,7 @@ class Main extends PluginBase {
 	 *
 	 * @return bool
 	 */
-	public function inQueue(Player $player) {
+	public function inQueue(Player $player) : bool {
 		foreach($this->queue as $map => $players) {
 			if(in_array($player->getName(), $players)) {
 				return true;
@@ -180,15 +186,15 @@ class Main extends PluginBase {
 	 * @param Sign $signTile
 	 */
 	public function addSign(Sign $signTile) {
-		$signs = $this->getSignConfig()->get("signs", []);
+		$signs = $this->signConfig->get("signs", []);
 		$signs[count($this->signTiles)] = [
 			$signTile->getX(),
 			$signTile->getY(),
 			$signTile->getZ(),
 			$signTile->getLevel()->getName()
 		];
-		$this->getSignConfig()->set("signs", $signs);
-		$this->getSignConfig()->save();
+		$this->signConfig->set("signs", $signs);
+		$this->signConfig->save();
 		$this->signTiles[] = $signTile;
 		if(self::isDev()) {
 			$this->getLogger()->info("New Sign Created! $signTile");
@@ -200,7 +206,7 @@ class Main extends PluginBase {
 	 *
 	 * @return int
 	 */
-	public function getNumberOfFreeArenas() {
+	public function getNumberOfFreeArenas() : int {
 		$numberOfFreeArenas = count($this->sessions);
 		foreach($this->sessions as $session) {
 			if($session->isActive()) {
@@ -232,7 +238,7 @@ class Main extends PluginBase {
 	 *
 	 * @return string[]
 	 */
-	public function getMaps() {
+	public function getMaps() : array {
 		return $this->maps;
 	}
 }

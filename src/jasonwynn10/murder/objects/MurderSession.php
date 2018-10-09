@@ -5,15 +5,15 @@ use pocketmine\Player;
 
 class MurderSession {
 	/** string $sessionName */
-	private $sessionName;
+	protected $sessionName;
 	/** string  */
-	private $killer, $detective;
+	protected $killer, $detective;
 	/** string[] $innocent */
-	private $innocent = [];
+	protected $innocent = [];
 	/** @var bool $active */
-	private $active = false;
+	protected $active = false;
 	/** @var GameMap $map */
-	private $map;
+	protected $map;
 
 	public function __construct(string $sessionName, GameMap $map, Player $killer = null, Player $detective = null, Player ...$innocent) {
 		$this->sessionName = $sessionName;
@@ -57,8 +57,9 @@ class MurderSession {
 		return $this->active;
 	}
 
-	public function setActive(bool $active = true) {
+	public function setActive(bool $active = true) : self {
 		$this->active = $active;
+		return $this;
 	}
 
 	public function getMap() : GameMap {

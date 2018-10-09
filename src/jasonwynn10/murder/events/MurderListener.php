@@ -23,7 +23,7 @@ class MurderListener implements Listener {
 	/**
 	 * @param EntityDamageEvent $ev
 	 */
-	public function onDamage(EntityDamageEvent $ev) {
+	public function onDamage(EntityDamageEvent $ev) : void {
 		if($ev instanceof EntityDamageByEntityEvent) {
 			/** @var Player $player */
 			if(($player = $ev->getEntity()) instanceof Player and ($session = $this->plugin->inSession($player)) != false and $session->isActive()) {
@@ -35,7 +35,7 @@ class MurderListener implements Listener {
 	/**
 	 * @param PlayerDeathEvent $ev
 	 */
-	public function onDeath(PlayerDeathEvent $ev) {
+	public function onDeath(PlayerDeathEvent $ev) : void {
 		if(($session = $this->plugin->inSession($ev->getPlayer())) != false and $session->isActive() and $session->getRole($ev->getPlayer()) == "detective") {
 			$ev->setDrops([Item::get(Item::BOW), Item::get(Item::ARROW)]); // only drop bow if in session and a detective
 		}elseif(($session = $this->plugin->inSession($ev->getPlayer())) != false and $session->isActive()) {
@@ -58,7 +58,7 @@ class MurderListener implements Listener {
 	/**
 	 * @param SignChangeEvent $ev
 	 */
-	public function onSign(SignChangeEvent $ev) {
+	public function onSign(SignChangeEvent $ev) : void {
 		if($ev->isCancelled()) {
 			return;
 		}

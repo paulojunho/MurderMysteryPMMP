@@ -38,5 +38,5 @@ Games: # game settings
       X2: 0
       Y2: 0
       Z2: 0
-    max-players: 7 # maximum players before others are not allowed to join
-    min-players: 4 # minimum players to start
+    Max-Players: 7 # maximum players before others are not allowed to join
+    Min-Players: 4 # minimum players to start

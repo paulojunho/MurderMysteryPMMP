@@ -7,7 +7,7 @@ use pocketmine\scheduler\Task;
 
 class SignRefreshTask extends Task {
 	/** @var Main $plugin */
-	private $plugin;
+	protected $plugin;
 
 	public function __construct(Main $owner) {
 		$this->plugin = $owner;

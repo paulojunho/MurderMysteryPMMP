@@ -9,7 +9,7 @@ use pocketmine\plugin\Plugin;
 class MurderSessionEvent extends PluginEvent implements Cancellable {
 	public static $handlerList = null;
 	/** @var MurderSession $session */
-	private $session;
+	protected $session;
 
 	public function __construct(Plugin $plugin, MurderSession $session) {
 		parent::__construct($plugin);
@@ -20,7 +20,8 @@ class MurderSessionEvent extends PluginEvent implements Cancellable {
 		return $this->session;
 	}
 
-	public function setSession(MurderSession $session) {
+	public function setSession(MurderSession $session) : self {
 		$this->session = $session;
+		return $this;
 	}
 }

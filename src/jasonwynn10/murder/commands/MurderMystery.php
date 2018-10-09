@@ -23,7 +23,7 @@ class MurderMystery extends PluginCommand {
 	 *
 	 * @return bool
 	 */
-	public function execute(CommandSender $sender, $alias, array $args) {
+	public function execute(CommandSender $sender, $alias, array $args) : bool {
 		if($sender instanceof Player and $this->testPermission($sender) and $this->getPlugin()->isEnabled() and count($args) > 0) {
 			if(isset($args[0]) and array_search($args[0], $this->getPlugin()->getMaps())) {
 				$this->getPlugin()->addQueue($sender, $args[0]);

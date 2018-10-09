@@ -7,13 +7,17 @@ use pocketmine\Server;
 
 class GameMap {
 	/** @var string $name */
-	private $name;
+	protected $name;
 	/** @var string $levelName */
-	private $levelName;
+	protected $levelName;
 	/** @var Vector3[] $spawnArea */
-	private $spawnArea = [];
+	protected $spawnArea = [];
 	/** @var Vector3[] $goldArea */
-	private $goldArea = [];
+	protected $goldArea = [];
+	/** @var int $minimumPlayers */
+	protected $minimumPlayers = 0;
+	/** @var int $maximumPlayers */
+	protected $maximumPlayers = 1;
 
 	/**
 	 * GameMap constructor.
@@ -24,16 +28,18 @@ class GameMap {
 	 * @param Vector3 $goldSpawnA
 	 * @param Vector3 $goldSpawnB
 	 * @param string $levelName
-	 * @param int $minimum
-	 * @param int $maximum
+	 * @param int $minimumPlayers
+	 * @param int $maximumPlayers
 	 */
-	public function __construct(string $name, Vector3 $playerSpawnA, Vector3 $playerSpawnB, Vector3 $goldSpawnA, Vector3 $goldSpawnB, string $levelName, int $minimum, int $maximum) {
+	public function __construct(string $name, Vector3 $playerSpawnA, Vector3 $playerSpawnB, Vector3 $goldSpawnA, Vector3 $goldSpawnB, string $levelName, int $minimumPlayers, int $maximumPlayers) {
 		$this->spawnArea[0] = $playerSpawnA;
 		$this->spawnArea[1] = $playerSpawnB;
 		$this->goldArea[0] = $goldSpawnA;
 		$this->goldArea[1] = $goldSpawnB;
 		$this->levelName = $levelName;
 		$this->name = $name;
+		$this->minimumPlayers = $minimumPlayers;
+		$this->maximumPlayers = $maximumPlayers;
 	}
 
 	/**
@@ -91,5 +97,39 @@ class GameMap {
 	 */
 	public function getName() : string {
 		return $this->name;
+	}
+
+	/**
+	 * @param int $minimumPlayers
+	 *
+	 * @return GameMap
+	 */
+	public function setMinimumPlayers(int $minimumPlayers) : self {
+		$this->minimumPlayers = $minimumPlayers;
+		return $this;
+}
+
+	/**
+	 * @param int $maximumPlayers
+	 *
+	 * @return GameMap
+	 */
+	public function setMaximumPlayers(int $maximumPlayers) : self {
+		$this->maximumPlayers = $maximumPlayers;
+		return $this;
+}
+
+	/**
+	 * @return int
+	 */
+	public function getMaximumPlayers() : int {
+		return $this->maximumPlayers;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getMinimumPlayers() : int {
+		return $this->minimumPlayers;
 	}
 }

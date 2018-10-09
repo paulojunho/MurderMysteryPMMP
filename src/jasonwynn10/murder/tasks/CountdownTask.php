@@ -8,8 +8,8 @@ use pocketmine\scheduler\Task;
 
 class CountdownTask extends Task {
 	/** @var Main $plugin */
-	private $plugin;
-	private $session;
+	protected $plugin;
+	protected $session;
 
 	public function __construct(Main $owner, MurderSession $session) {
 		$this->plugin = $owner;

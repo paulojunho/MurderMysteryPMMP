@@ -7,7 +7,7 @@ use pocketmine\plugin\Plugin;
 
 class MurderSessionEndEvent extends MurderSessionEvent {
 	/** @var string $winner */
-	private $winner;
+	protected $winner;
 
 	public function __construct(Plugin $plugin, MurderSession $session, Player $winner) {
 		parent::__construct($plugin, $session);
@@ -18,7 +18,8 @@ class MurderSessionEndEvent extends MurderSessionEvent {
 		return $this->winner;
 	}
 
-	public function setWinner(string $winner) {
+	public function setWinner(string $winner) : self {
 		$this->winner = $winner;
+		return $this;
 	}
 }
