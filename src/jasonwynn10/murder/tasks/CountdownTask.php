@@ -9,6 +9,7 @@ use pocketmine\scheduler\Task;
 class CountdownTask extends Task {
 	/** @var Main $plugin */
 	protected $plugin;
+	/** @var MurderSession $session */
 	protected $session;
 
 	public function __construct(Main $owner, MurderSession $session) {

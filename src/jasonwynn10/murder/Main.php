@@ -31,7 +31,7 @@ class Main extends PluginBase {
 	protected $maps = [];
 
 	public function onLoad() : void {
-		$this->getServer()->getCommandMap()->register(MurderMystery::class, new MurderMystery($this));
+		$this->getServer()->getCommandMap()->register("MurderMystery", new MurderMystery($this));
 	}
 
 	public function onEnable() : void {

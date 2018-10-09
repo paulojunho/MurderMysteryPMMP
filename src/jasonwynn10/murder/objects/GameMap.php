@@ -1,6 +1,7 @@
 <?php
 namespace jasonwynn10\murder\objects;
 
+use pocketmine\block\Block;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\Server;
@@ -15,9 +16,9 @@ class GameMap {
 	/** @var Vector3[] $goldArea */
 	protected $goldArea = [];
 	/** @var int $minimumPlayers */
-	protected $minimumPlayers = 0;
+	protected $minimumPlayers = 4;
 	/** @var int $maximumPlayers */
-	protected $maximumPlayers = 1;
+	protected $maximumPlayers = 7;
 
 	/**
 	 * GameMap constructor.
@@ -46,10 +47,17 @@ class GameMap {
 	 * @return Position
 	 */
 	public function getRandomPlayerSpawnCoords() : Position {
-		$x = mt_rand($this->spawnArea[0]->x, $this->spawnArea[1]->x);
-		$y = mt_rand($this->spawnArea[0]->y, $this->spawnArea[1]->y);
-		$z = mt_rand($this->spawnArea[0]->z, $this->spawnArea[1]->z);
-		$level = Server::getInstance()->getLevelByName($this->levelName);
+		$x = $y = $z = 0;
+		$level = null;
+		while(true) {
+			$x = mt_rand($this->spawnArea[0]->x, $this->spawnArea[1]->x);
+			$y = mt_rand($this->spawnArea[0]->y, $this->spawnArea[1]->y);
+			$z = mt_rand($this->spawnArea[0]->z, $this->spawnArea[1]->z);
+			$level = Server::getInstance()->getLevelByName($this->levelName);
+			if($level !== null and $level->getBlockIdAt($x, $y, $z) === Block::AIR and $level->getBlockIdAt($x, $y + 1, $z) === Block::AIR) {
+				break;
+			}
+		}
 		return new Position($x, $y, $z, $level);
 	}
 
@@ -57,10 +65,17 @@ class GameMap {
 	 * @return Position
 	 */
 	public function getRandomGoldSpawnCoords() : Position {
-		$x = mt_rand($this->goldArea[0]->x, $this->goldArea[1]->x);
-		$y = mt_rand($this->goldArea[0]->y, $this->goldArea[1]->y);
-		$z = mt_rand($this->goldArea[0]->z, $this->goldArea[1]->z);
-		$level = Server::getInstance()->getLevelByName($this->levelName);
+		$x = $y = $z = 0;
+		$level = null;
+		while(true) {
+			$x = mt_rand($this->goldArea[0]->x, $this->goldArea[1]->x);
+			$y = mt_rand($this->goldArea[0]->y, $this->goldArea[1]->y);
+			$z = mt_rand($this->goldArea[0]->z, $this->goldArea[1]->z);
+			$level = Server::getInstance()->getLevelByName($this->levelName);
+			if($level !== null and $level->getBlockIdAt($x, $y, $z) === Block::AIR and $level->getBlockIdAt($x, $y + 1, $z) === Block::AIR) {
+				break;
+			}
+		}
 		return new Position($x, $y, $z, $level);
 	}
 
@@ -88,7 +103,7 @@ class GameMap {
 	/**
 	 * @return string
 	 */
-	public function __toString() {
+	public function __toString() : string {
 		return $this->getName();
 	}
 
