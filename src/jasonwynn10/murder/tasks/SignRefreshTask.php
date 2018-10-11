@@ -4,6 +4,7 @@ namespace jasonwynn10\murder\tasks;
 
 use jasonwynn10\murder\Main;
 use pocketmine\scheduler\Task;
+use pocketmine\utils\TextFormat;
 
 class SignRefreshTask extends Task {
 	/** @var Main $plugin */
@@ -14,6 +15,17 @@ class SignRefreshTask extends Task {
 	}
 
 	public function onRun($currentTick) {
-		// TODO: Implement onRun() method.
+		foreach($this->plugin->getSigns() as $sign) {
+			$text = $sign->getLine(1);
+			if(in_array($text, $this->plugin->getMaps())) {
+				$session = $this->plugin->getMapSession($text);
+				if($session !== null) {
+					$SessionPlayers = $session->getPlayers();
+				}
+				$queuePlayers = $this->plugin->getMapQueue($text);
+				$sign->setText(TextFormat::RESET . TextFormat::GREEN . "Murder Mystery", $text, count($SessionPlayers ?? []) > 0 ? "" : "In Queue:", count($SessionPlayers ?? []) > 0 ? "Game In Session" : count($queuePlayers)); // use text formatting as indicator for valid sign on sign loadings
+				$this->plugin->addSign($sign);
+			}
+		}
 	}
 }

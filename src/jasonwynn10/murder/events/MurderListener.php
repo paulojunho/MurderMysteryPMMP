@@ -8,10 +8,12 @@ use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerDeathEvent;
+use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\tile\Sign;
+use pocketmine\utils\TextFormat;
 
 class MurderListener implements Listener {
 	private $plugin;
@@ -67,16 +69,42 @@ class MurderListener implements Listener {
 		if(stripos($ev->getLine(0), "murder") != false and ($player->hasPermission("murder.mystery.sign.make") or $player->hasPermission("murder.mystery.sign"))) {
 			$signTile = $sign->getLevel()->getTile($sign);
 			if($signTile instanceof Sign) {
-				$text = $signTile->getText();
-				if(in_array($text[1], $this->plugin->getMaps())) {
-					$signTile->setText("", "", "", ""); // TODO set map names and player counts
+				$text = $signTile->getLine(1);
+				if(in_array($text, $this->plugin->getMaps())) {
+					$session = $this->plugin->getMapSession($text);
+					if($session !== null) {
+						$SessionPlayers = $session->getPlayers();
+					}
+					$queuePlayers = $this->plugin->getMapQueue($text);
+					$signTile->setText(TextFormat::RESET . TextFormat::GREEN . "Murder Mystery", $text, count($SessionPlayers ?? []) > 0 ? "" : "In Queue:", count($SessionPlayers ?? []) > 0 ? "Game In Session" : count($queuePlayers)); // use text formatting as indicator for valid sign on sign loadings
 					$this->plugin->addSign($signTile);
 				}else {
-					$player->sendMessage($this->plugin->getLanguage()->translateString("sign.invalidMap", [$text[1]]));
+					$player->sendMessage($this->plugin->getLanguage()->translateString("sign.invalidMap", [$text]));
 				}
 			}
 		}
 	}
 
-	// TODO: create game session of sign tap
+	/**
+	 * @param PlayerInteractEvent $event
+	 */
+	public function onTap(PlayerInteractEvent $event) : void {
+		$pos = $event->getBlock()->asPosition();
+		foreach($this->plugin->getSigns() as $sign) {
+			if($sign->x === $pos->x and $sign->y === $pos->y and $sign->z === $pos->z) {
+				$text = $sign->getLine(1);
+				if(in_array($text, $this->plugin->getMaps())) {
+					if($this->plugin->inQueue($event->getPlayer())) {
+						$event->getPlayer()->sendMessage($this->plugin->getLanguage()->translateString("queue.alreadyjoined", [$text]));
+						return;
+					}
+					$this->plugin->addQueue($event->getPlayer(), $text);
+					$event->getPlayer()->sendMessage($this->plugin->getLanguage()->translateString("queue.joined", [$text]));
+				}else {
+					$event->getPlayer()->sendMessage($this->plugin->getLanguage()->translateString("sign.invalidMap", [$text]));
+				}
+				break;
+			}
+		}
+	}
 }

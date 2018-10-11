@@ -15,13 +15,13 @@ class MurderSession {
 	/** @var GameMap $map */
 	protected $map;
 
-	public function __construct(string $sessionName, GameMap $map, Player $killer = null, Player $detective = null, Player ...$innocent) {
+	public function __construct(string $sessionName, GameMap $map, string $killer, string $detective, string ...$innocent) {
 		$this->sessionName = $sessionName;
 		$this->map = $map;
-		$this->killer = $killer->getName();
-		$this->detective = $detective->getName();
-		foreach($innocent as $pl) {
-			$this->innocent[] = $pl->getName();
+		$this->killer = $killer;
+		$this->detective = $detective;
+		foreach($innocent as $player) {
+			$this->innocent[] = $player;
 		}
 	}
 

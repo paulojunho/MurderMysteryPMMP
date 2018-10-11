@@ -13,6 +13,7 @@ use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\tile\Sign;
 use pocketmine\utils\Config;
+use pocketmine\utils\TextFormat;
 use pocketmine\utils\TextFormat as TF;
 use spoondetector\SpoonDetector;
 
@@ -27,7 +28,7 @@ class Main extends PluginBase {
 	protected $signConfig;
 	/** @var Sign[] $signTiles */
 	protected $signTiles = [];
-	/** @var string[] $maps */
+	/** @var GameMap[] $maps */
 	protected $maps = [];
 
 	public function onLoad() : void {
@@ -53,48 +54,29 @@ class Main extends PluginBase {
 		$this->maps = [];
 		foreach($this->getConfig()->get("Games", []) as $name => $data) {
 			if(!isset($data["World"]) or !$this->getServer()->loadLevel($data["World"])) {
-				if(self::isDev()) {
-					$this->getLogger()->info("Map '" . $name . "' failed to load with invalid Level");
-				}
+				$this->getLogger()->debug("Map '" . $name . "' failed to load with invalid Level");
 				continue;
 			}
 			if(!isset($data["Player-Spawn-Area"]) or !is_array($data["Player-Spawn-Area"])) {
-				if(self::isDev()) {
-					$this->getLogger()->info("Map '" . $name . "' failed to load with invalid Player Spawn Coordinates");
-				}
+				$this->getLogger()->debug("Map '" . $name . "' failed to load with invalid Player Spawn Coordinates");
 				continue;
 			}
 			if(!isset($data["Player-Spawn-Area"]["X1"]) or !isset($data["Player-Spawn-Area"]["Y1"]) or !isset($data["Player-Spawn-Area"]["Z1"]) or !isset($data["Player-Spawn-Area"]["X2"]) or !isset($data["Player-Spawn-Area"]["Y2"]) or !isset($data["Player-Spawn-Area"]["Z2"])) {
-				if(self::isDev()) {
-					$this->getLogger()->info("Map '" . $name . "' failed to load with invalid Player Spawn Coordinates");
-				}
+				$this->getLogger()->debug("Map '" . $name . "' failed to load with invalid Player Spawn Coordinates");
 				continue;
 			}
 			if(!isset($data["PGold-Spawn-Area"]) or !is_array($data["Gold-Spawn-Area"])) {
-				if(self::isDev()) {
-					$this->getLogger()->info("Map '" . $name . "' failed to load with invalid Gold Spawn Coordinates");
-				}
+				$this->getLogger()->debug("Map '" . $name . "' failed to load with invalid Gold Spawn Coordinates");
 				continue;
 			}
 			if(!isset($data["Gold-Spawn-Area"]["X1"]) or !isset($data["Gold-Spawn-Area"]["Y1"]) or !isset($data["Gold-Spawn-Area"]["Z1"]) or !isset($data["Gold-Spawn-Area"]["X2"]) or !isset($data["Gold-Spawn-Area"]["Y2"]) or !isset($data["Gold-Spawn-Area"]["Z2"])) {
-				if(self::isDev()) {
-					$this->getLogger()->info("Map '" . $name . "' failed to load with invalid Gold Spawn Coordinates");
-				}
+				$this->getLogger()->debug("Map '" . $name . "' failed to load with invalid Gold Spawn Coordinates");
 				continue;
 			}
-			$map = new GameMap($name, new Vector3(), new Vector3(), new Vector3(), new Vector3(), $data["World"], $data["Max-Players"], $data["Min-Players"]);
+			$map = new GameMap($name, new Vector3((float) $data["Player-Spawn-Area"]["X1"], (float) $data["Player-Spawn-Area"]["Y1"], (float) $data["Player-Spawn-Area"]["Z1"]), new Vector3((float) $data["Player-Spawn-Area"]["X2"], (float) $data["Player-Spawn-Area"]["Y2"], (float) $data["Player-Spawn-Area"]["Z2"]), new Vector3((float) $data["Gold-Spawn-Area"]["X1"], (float) $data["Gold-Spawn-Area"]["Y1"], (float) $data["Gold-Spawn-Area"]["Z1"]), new Vector3((float) $data["Gold-Spawn-Area"]["X2"], (float) $data["Gold-Spawn-Area"]["Y2"], (float) $data["Gold-Spawn-Area"]["Z2"]), $data["World"], $data["Max-Players"], $data["Min-Players"]);
 			$this->maps[$name] = $map;
-			if(self::isDev()) {
-				$this->getLogger()->info("Map '" . $map . "' Loaded with Level '" . $map->getLevel() . "'");
-			}
+			$this->getLogger()->debug("Map '" . $map . "' Loaded with Level '" . $map->getLevel() . "'");
 		}
-	}
-
-	/**
-	 * @return bool
-	 */
-	public static function isDev() : bool {
-		return true; // TODO: set false for release
 	}
 
 	public function reloadSigns() {
@@ -104,16 +86,13 @@ class Main extends PluginBase {
 				continue;
 			}
 			$pos = new Vector3($data["x"], $data["y"], $data["z"]);
-			if(!($signTile = $world->getTile($pos)) instanceof Sign) {
-				if(self::isDev()) {
-					$this->getLogger()->info("Sign failed to load! $signTile");
-				}
+			$signTile = $world->getTile($pos);
+			if(!$signTile instanceof Sign or $signTile->getLine(0) === TextFormat::RESET . TextFormat::GREEN . "Murder Mystery") {
+				$this->getLogger()->debug("Sign failed to load! $signTile");
 				continue;
 			}
 			$this->signTiles[] = $signTile;
-			if(self::isDev()) {
-				$this->getLogger()->info("Sign loaded! $signTile");
-			}
+			$this->getLogger()->debug("Sign loaded! $signTile");
 		}
 	}
 
@@ -127,8 +106,6 @@ class Main extends PluginBase {
 	public function onDisable() : void {
 		$this->getLogger()->notice(TF::GREEN . "Disabled!");
 	}
-
-	// API
 
 	/**
 	 * @api
@@ -153,12 +130,20 @@ class Main extends PluginBase {
 	 * @api
 	 *
 	 * @param Player $player
+	 * @param null|string $map
 	 */
-	public function removeQueue(Player $player) {
+	public function removeQueue(Player $player, ?string $map = null) {
+		if(isset($map) and in_array($map, array_keys($this->queue))) {
+			if(in_array($player->getName(), $this->queue[$map])) {
+				$key = array_search($player->getName(), $this->queue[$map]);
+				unset($this->queue[$map][$key]);
+			}
+			return;
+		}
 		foreach($this->queue as $map => $players) {
 			if(in_array($player->getName(), $players)) {
 				$key = array_search($player->getName(), $players);
-				unset($this->queue[$key]);
+				unset($this->queue[$map][$key]);
 				return;
 			}
 		}
@@ -169,9 +154,14 @@ class Main extends PluginBase {
 	 *
 	 * @param Player $player
 	 *
+	 * @param null|string $map
+	 *
 	 * @return bool
 	 */
-	public function inQueue(Player $player) : bool {
+	public function inQueue(Player $player, ?string $map = null) : bool {
+		if(isset($map) and in_array($map, array_keys($this->queue))) {
+			return in_array($player->getName(), $this->queue[$map]);
+		}
 		foreach($this->queue as $map => $players) {
 			if(in_array($player->getName(), $players)) {
 				return true;
@@ -188,17 +178,15 @@ class Main extends PluginBase {
 	public function addSign(Sign $signTile) {
 		$signs = $this->signConfig->get("signs", []);
 		$signs[count($this->signTiles)] = [
-			$signTile->getX(),
-			$signTile->getY(),
-			$signTile->getZ(),
+			$signTile->x,
+			$signTile->y,
+			$signTile->z,
 			$signTile->getLevel()->getName()
 		];
 		$this->signConfig->set("signs", $signs);
 		$this->signConfig->save();
 		$this->signTiles[] = $signTile;
-		if(self::isDev()) {
-			$this->getLogger()->info("New Sign Created! $signTile");
-		}
+		$this->getLogger()->debug("New Sign Created! $signTile");
 	}
 
 	/**
@@ -240,5 +228,71 @@ class Main extends PluginBase {
 	 */
 	public function getMaps() : array {
 		return $this->maps;
+	}
+
+	/**
+	 * @return Sign[]
+	 */
+	public function getSigns() : array {
+		return $this->signTiles;
+	}
+
+	/**
+	 * @return MurderSession[]
+	 */
+	public function getSessions() : array {
+		return $this->sessions;
+	}
+
+	/**
+	 * @return string[][]
+	 */
+	public function getQueue() : array {
+		return $this->queue;
+	}
+
+	/**
+	 * @param string $map
+	 *
+	 * @return null|MurderSession
+	 */
+	public function startSession(string $map) : ?MurderSession {
+		if(isset($this->queue[$map]) and isset($this->maps[$map])) {
+			$players = $this->queue[$map];
+			$key = array_rand($players);
+			$detective = $players[$key];
+			unset($players[$key]);
+			$key = array_rand($players);
+			$killer = $players[$key];
+			unset($players[$key]);
+			$innocent = $players;
+			$map = $this->maps[$map];
+			return $this->sessions[$map->getName()] = new MurderSession($map->getName(), $map, $killer, $detective, ...$innocent);
+		}
+		return null;
+	}
+
+	/**
+	 * @param string $map
+	 *
+	 * @return null|MurderSession
+	 */
+	public function getMapSession(string $map) : ?MurderSession {
+		if(!in_array($map, array_keys($this->sessions))) {
+			return null;
+		}
+		return $this->sessions[$map];
+	}
+
+	/**
+	 * @param string $map
+	 *
+	 * @return string[]
+	 */
+	public function getMapQueue(string $map) : array {
+		if(!in_array($map, array_keys($this->queue))) {
+			return [];
+		}
+		return $this->queue[$map];
 	}
 }
