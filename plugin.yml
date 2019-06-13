@@ -1,10 +1,9 @@
-name: MurderMysteryPMMP
-author: "jasonwynn10"
-version: 1.0.0
-api:
-- 3.0.0
-main: jasonwynn10\murder\Main
-description: "A Murder Mystery Minigame Plugin for PMMP servers"
+name: MurderMystery
+author: AndersonWakeBR
+version: 0.9
+api: ["3.0.0"]
+main: AndersonWakeBR\murder\Main
+description: "Um Plugin de Minigame Murder Mystery para servidores PMMP"
 load: POSTWORLD
 website: "https://github.com/jasonwynn10/MurderMysteryPMMP"
 commands:
