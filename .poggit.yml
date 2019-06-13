@@ -1,10 +1,9 @@
 --- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/jasonwynn10/MurderMysteryPMMP
 branches:
 - master
+- dev
+- 1.2-WIP
 projects:
-  MurderMysteryPMMP:
+  Murder:
     path: ""
-    libs:
-    - src: Falkirks/spoondetector/spoondetector
-      version: 0.0.0
 ...
