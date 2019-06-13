@@ -18,20 +18,26 @@ use pocketmine\utils\TextFormat as TF;
 use spoondetector\SpoonDetector;
 
 class Main extends PluginBase {
+	
 	/** @var BaseLang $baseLang */
 	protected $baseLang = null;
+	
 	/** @var string[][] $queue */
 	protected $queue = [];
+	
 	/** @var MurderSession[] $sessions */
 	protected $sessions = [];
+	
 	/** @var Config $signConfig */
 	protected $signConfig;
+	
 	/** @var Sign[] $signTiles */
 	protected $signTiles = [];
+	
 	/** @var GameMap[] $maps */
 	protected $maps = [];
 
-	public function onLoad() : void {
+	public function onEnable() : void {
 		$this->getServer()->getCommandMap()->register("MurderMystery", new MurderMystery($this));
 	}
 
